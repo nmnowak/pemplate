@@ -9,8 +9,8 @@ from typing import Any, Dict, Optional, TypedDict
 
 DEFAULT_BRANCH = "main"
 DEFAULT_PYTHON = "3.8"
-DEFAULT_GIT_USER = "nmnowak"
-DEFAULT_GIT_EMAIL = "nowak.nathan@gmail.com"
+DEFAULT_GIT_USER = "{git_username}"
+DEFAULT_GIT_EMAIL = "{git_email}"
 SETTINGS_FILE = "settings.ini"
 
 
@@ -60,7 +60,7 @@ def update_ini() -> None:
     user = input_with_default(f"github username", defaults=config, key="user")
     description = input_with_default("description", defaults=config)
     keywords = input_with_default("keywords", defaults=config)
-    author = input_with_default(f"author", defaults=config)
+    author = input_with_default(f"author", defaults=config, fallback=user)
     author_email = input_with_default(f"author email", defaults=config)
     copyright = input_with_default(f"copyright", defaults=config, fallback=author)
     branch = input_with_default(f"branch", defaults=config, fallback=DEFAULT_BRANCH)
@@ -175,17 +175,30 @@ def configure_git() -> None:
     subprocess.run(["git", "config", "--local", "user.email", DEFAULT_GIT_EMAIL])
 
 
+def set_git_user() -> None:
+    """Set git user info."""
+    config = configparser.ConfigParser()
+    config.read("settings.ini")
+    user = config.get("DEFAULT", "user", fallback="{}")
+    if not user.startswith("{"):
+        subprocess.run(["git", "config", "--local", "user.name", user])
+    author_email = config.get("DEFAULT", "author_email", fallback="{}")
+    if not author_email.startswith("{"):
+        subprocess.run(["git", "config", "--local", "user.email", author_email])
+
+
 def create_new() -> None:
     """Run all setup steps."""
     if not os.path.exists(SETTINGS_FILE):
         configure_git()
         initialize_project()
-        # install_git_hooks()
+        # install_git_hooks() does not need to be called because the hooks
+        # are installed as part of initialize project.
         update_ini()
         update_index()
         update_core()
-        build_docs()
         build_lib()
+        build_docs()
 
 
 if __name__ == "__main__":
