@@ -1,0 +1,65 @@
+version: "3.8"
+
+x-default: &default
+  restart: unless-stopped
+  working_dir: /project
+  build:
+    context: .
+    dockerfile: ./nbdev-env/Dockerfile
+  image: nbdev-env:python-3.10
+  logging:
+    driver: json-file
+    options:
+      max-size: 50m
+  stdin_open: true
+  tty: true
+  volumes:
+    - type: volume
+      source: home-loper
+      target: /home/loper
+    - type: bind
+      source: .
+      target: /project
+
+services:
+  setup:
+    <<: *default
+    restart: "no"
+    command: ["python", "nbdev-env/guided.py"]
+
+  notebook:
+    <<: *default
+    command: ["jupyter-lab", "--allow-root", "--no-browser", "--ip=0.0.0.0", "--port=8080", "--ServerApp.token=''", "--ServerApp.password=''", "--ContentsManager.allow_hidden=True"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - setup
+
+  watcher:
+    <<: *default
+    command: ["watchmedo", "shell-command", "--command", "nbdev_build_docs", "--pattern", "*.ipynb", "--recursive", "--drop"]
+    network_mode: host # for GitHub Codespaces https://github.com/features/codespaces/
+    depends_on:
+      - notebook
+
+  jekyll:
+    <<: *default
+    ports:
+      - "4000:4000"
+    command: >
+      bash -c
+      "pip install . &&
+      nbdev_build_docs &&
+      cd docs &&
+      bundle i &&
+      chmod -R u+rwx . &&
+      bundle exec jekyll serve --host 0.0.0.0"
+    depends_on:
+      - watcher
+
+volumes:
+  home-loper:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "./nbdev-env/loper"
