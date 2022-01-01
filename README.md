@@ -2,11 +2,9 @@
 A template for creating projects with nbdev.
 
 # Usage
-After cloning the repo run:
+After cloning the repo run the following to initialize the project:
 > docker-compose --file nbdev-env/docker-compose.yml --project-directory . run setup
 
 
-to initialize the project and then run:
+Run the below command to launch jupyter lab and start developing:
 > docker-compose --file nbdev-env/docker-compose.yml --project-directory . up
-
-to launch jupyter lab and start developing.
