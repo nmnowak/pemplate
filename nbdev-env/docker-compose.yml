@@ -6,7 +6,7 @@ x-default: &default
   build:
     context: .
     dockerfile: ./nbdev-env/Dockerfile
-  image: nbdev-env:python-3.10.4
+  image: nbdev-env:python-3.10.5
   logging:
     driver: json-file
     options:
