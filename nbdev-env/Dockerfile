@@ -1,4 +1,4 @@
-FROM python:3.10.5-slim-bullseye
+FROM python:3.10.6-slim-bullseye
 
 ARG GID=1000
 ARG UID=1000
