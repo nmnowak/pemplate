@@ -35,27 +35,16 @@ services:
     depends_on:
       - setup
 
-  watcher:
-    <<: *default
-    command: ["watchmedo", "shell-command", "--command", "nbdev_build_docs", "--pattern", "*.ipynb", "--recursive", "--drop"]
-    network_mode: host # for GitHub Codespaces https://github.com/features/codespaces/
-    depends_on:
-      - notebook
-
-  jekyll:
+  quarto:
     <<: *default
     ports:
-      - "4000:4000"
+      - "3000:3000"
     command: >
       bash -c
       "pip install . &&
-      nbdev_build_docs &&
-      cd docs &&
-      bundle i &&
-      chmod -R u+rwx . &&
-      bundle exec jekyll serve --host 0.0.0.0"
+      nbdev_preview"
     depends_on:
-      - watcher
+      - notebook
 
 volumes:
   home-loper:

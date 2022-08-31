@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional, TypedDict
 
 
 DEFAULT_BRANCH = "main"
-DEFAULT_PYTHON = "3.8"
+DEFAULT_PYTHON = "3.10"
 DEFAULT_GIT_USER = "{git_username}"
 DEFAULT_GIT_EMAIL = "{git_email}"
 SETTINGS_FILE = "settings.ini"
@@ -28,6 +28,7 @@ def input_with_default(label: str, defaults: configparser.ConfigParser, fallback
 def initialize_project() -> None:
     """Install the project."""
     subprocess.run(["nbdev_new"])
+    subprocess.run(["nbdev_install_hooks"])
     shutil.copy("./nbdev-env/00_core.ipynb", "./00_core.ipynb")
     shutil.copy("./nbdev-env/index.ipynb", "./index.ipynb")
     
@@ -122,9 +123,9 @@ def update_index() -> None:
     lib_name = config.get("DEFAULT", "lib_name")
 
     for cell in index["cells"]:
-        if (is_code(cell) and source_startswith(cell, "# hide")):
+        if (is_code(cell) and source_startswith(cell, "#| hide")):
             cell["source"] = [
-                f"# hide\n",
+                f"#| hide\n",
                 f"from {lib_name}.core import*"]
         elif (is_markdown(cell) and source_startswith(cell, "# template")):
             cell["source"] = [
@@ -190,15 +191,16 @@ def set_git_user() -> None:
 def create_new() -> None:
     """Run all setup steps."""
     if not os.path.exists(SETTINGS_FILE):
-        configure_git()
+        # configure_git()
         initialize_project()
+        set_git_user()
         # install_git_hooks() does not need to be called because the hooks
         # are installed as part of initialize project.
-        update_ini()
+        # update_ini()
         update_index()
         update_core()
-        build_lib()
-        build_docs()
+        # build_lib()
+        # build_docs()
 
 
 if __name__ == "__main__":

@@ -1,3 +1,2 @@
 jupyterlab
 nbdev
-watchdog[watchmedo]
