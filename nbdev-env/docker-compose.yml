@@ -6,7 +6,7 @@ x-default: &default
   build:
     context: .
     dockerfile: ./nbdev-env/Dockerfile
-  image: nbdev-env:python-3.10.6
+  image: nbdev-env:python-3.10.9
   logging:
     driver: json-file
     options:
@@ -31,14 +31,14 @@ services:
     <<: *default
     command: ["jupyter-lab", "--allow-root", "--no-browser", "--ip=0.0.0.0", "--port=8080", "--ServerApp.token=''", "--ServerApp.password=''", "--ContentsManager.allow_hidden=True"]
     ports:
-      - "8080:8080"
+      - "8079:8080"
     depends_on:
       - setup
 
   quarto:
     <<: *default
     ports:
-      - "3000:3000"
+      - "3079:3000"
     command: >
       bash -c
       "pip install . &&
