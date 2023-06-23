@@ -1,4 +1,4 @@
-FROM python:3.10.9-slim-bullseye
+FROM python:3.11.4-slim-bookworm
 
 ARG GID=1000
 ARG UID=1000
@@ -7,6 +7,7 @@ RUN addgroup --gid=$GID loper && adduser --uid=$UID --gid=$GID loper && \
     apt-get update && apt-get install -y --no-install-recommends curl git && \
     ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime && \
     rm -rf /var/lib/apt/lists/*
+
 RUN curl -LO https://www.quarto.org/download/latest/quarto-linux-amd64.deb && \
     dpkg -i *64.deb && rm *64.deb
 
